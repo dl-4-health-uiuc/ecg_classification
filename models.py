@@ -61,3 +61,12 @@ def get_model(model_name):
         model = nn.DataParallel(model)
     return model.to(device)
 
+def transfer_model(pretrained):
+    for param in pretrained.parameters():
+        param.requires_grad = False
+    pretrained.fc2 = nn.Sequential(nn.Linear(32,32), nn.ReLU(), nn.Linear(32,2))
+    if device_count > 1:
+        pretrained = nn.DataParallel(pretrained)
+    pretrained = pretrained.to(device)
+    return pretrained
+
