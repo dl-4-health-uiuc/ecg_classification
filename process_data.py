@@ -27,12 +27,12 @@ def load_data(batch_size = 128):
     Y = np.array(df_train[187].values).astype(int)
     X = np.array(df_train[list(range(187))].values)
 
-    Y_test = np.array(df_test[187].values)
+    Y_test = np.array(df_test[187].values).astype(int)
     X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]
 	
 	#Smote for data augmentation
 	sm = SMOTETomek()
-	X_sm, y_sm = sm.fit_resample(X,y)  
+	X_sm, Y_sm = sm.fit_resample(X,Y)  
     X_sm = X_sm[..., np.newaxis]
 
     train_dataset = CustomDataset(X_sm, Y_sm)
