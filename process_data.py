@@ -29,10 +29,10 @@ def load_data(batch_size = 128):
 
     Y_test = np.array(df_test[187].values).astype(int)
     X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]
-	
-	#Smote for data augmentation
-	sm = SMOTETomek()
-	X_sm, Y_sm = sm.fit_resample(X,Y)  
+
+    #Smote for data augmentation
+    sm = SMOTETomek()
+    X_sm, Y_sm = sm.fit_resample(X,Y)  
     X_sm = X_sm[..., np.newaxis]
 
     train_dataset = CustomDataset(X_sm, Y_sm)
