@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device_count = torch.cuda.device_count()
+    
 ## The model from the paper ECG Heartbeat Classification: A Deep Transferable Representation
 class CNResidual(nn.Module):
     def __init__(self, size):
@@ -19,39 +22,36 @@ class CNResidual(nn.Module):
     
 class CNet(nn.Module):
 
-    def __init__(self):
+    def __init__(self, num_resids=5):
         super().__init__()
         # layers
         self.c1 = nn.Conv1d(1, 32, kernel_size=5, padding=2)
-        self.cresid1 = CNResidual(32)
-        self.cresid2 = CNResidual(32)
-        self.cresid3 = CNResidual(32)
-        self.cresid4 = CNResidual(32)
-        self.cresid5 = CNResidual(32)
-#         self.cresids = []
-#         for i in range(NUM_RESIDUAL_BLOCKS):
-#             self.cresids.append(CNResidual(32).to(device))
+#         self.cresid1 = CNResidual(32)
+#         self.cresid2 = CNResidual(32)
+#         self.cresid3 = CNResidual(32)
+#         self.cresid4 = CNResidual(32)
+#         self.cresid5 = CNResidual(32)
+        self.cresids = nn.ModuleList()
+        for i in range(num_resids):
+            self.cresids.append(CNResidual(32))
         self.fc1 = nn.Linear(64, 32)
         self.fc2 = nn.Linear(32, 5)
         
     def forward(self, x):
         # call layers
         x = self.c1(x)
-        x = self.cresid1(x)
-        x = self.cresid2(x)
-        x = self.cresid3(x)
-        x = self.cresid4(x)
-        x = self.cresid5(x)
-#         for cresid in self.cresids:
-#             x = cresid(x)
+#         x = self.cresid1(x)
+#         x = self.cresid2(x)
+#         x = self.cresid3(x)
+#         x = self.cresid4(x)
+#         x = self.cresid5(x)
+        for cresid in self.cresids:
+            x = cresid(x)
         x  = x.reshape(-1, 64)
         x = F.relu(self.fc1(x))
         return self.fc2(x)
 
 def get_model(model_name):
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    device_count = torch.cuda.device_count()
-
     if model_name == "cnet":
         model = CNet()
         
@@ -61,12 +61,14 @@ def get_model(model_name):
         model = nn.DataParallel(model)
     return model.to(device)
 
-def transfer_model(pretrained):
-    for param in pretrained.parameters():
-        param.requires_grad = False
-    pretrained.fc2 = nn.Sequential(nn.Linear(32,32), nn.ReLU(), nn.Linear(32,2))
+
+def transfer_model(pretrained, freeze_params=True):
+    if freeze_params:
+        for param in pretrained.parameters():
+            param.requires_grad = False
+    pretrained.fc1 = nn.Linear(64,32)
+    pretrained.fc2 = nn.Linear(32, 1)
     if device_count > 1:
         pretrained = nn.DataParallel(pretrained)
     pretrained = pretrained.to(device)
     return pretrained
-

@@ -4,6 +4,7 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from imblearn.combine import SMOTETomek
+from sklearn.model_selection import train_test_split
 
 class CustomDataset(Dataset):
     
@@ -18,7 +19,7 @@ class CustomDataset(Dataset):
         return torch.tensor(self.x[index]), torch.tensor(self.y[index])
 
 
-def load_data(batch_size = 128):
+def load_data(batch_size = 128, smote=False):
 
     df_train = pd.read_csv("input/mitbih_train.csv", header=None)
     df_train = df_train.sample(frac=1)
@@ -31,11 +32,12 @@ def load_data(batch_size = 128):
     X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]
 
     #Smote for data augmentation
-    sm = SMOTETomek()
-    X_sm, Y_sm = sm.fit_resample(X,Y)  
-    X_sm = X_sm[..., np.newaxis]
+    if smote:
+        sm = SMOTETomek()
+        X, Y = sm.fit_resample(X,Y)  
+        X = X[..., np.newaxis]
 
-    train_dataset = CustomDataset(X_sm, Y_sm)
+    train_dataset = CustomDataset(X, Y)
     val_dataset = CustomDataset(X_test, Y_test)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -43,22 +45,29 @@ def load_data(batch_size = 128):
     
     return train_loader, val_loader
 
-def load_data_mi(batch_size = 128):
+def load_data_mi(batch_size = 128, smote=False):
 
     df_mi1 = pd.read_csv("input/ptbdb_abnormal.csv", header=None)
     df_mi2 = pd.read_csv("input/ptbdb_normal.csv", header=None)
     df_mi = pd.concat([df_mi1,df_mi2], ignore_index=True)
-    df_mi = df_mi.sample(frac=1, random_state=1)
-    train_ratio = 0.7
-    train_index = round(0.7*len(df_mi))
-    df_train = df_mi.iloc[:train_index]
-    df_test = df_mi.iloc[train_index:]
+#     df_mi = df_mi.sample(frac=1, random_state=1)
+#     train_ratio = 0.8
+#     train_index = round(0.8*len(df_mi))
+    df_train, df_test = train_test_split(df_mi, test_size=0.2, random_state=1, stratify=df_mi[187])
+
+#     df_train = df_mi.iloc[:train_index]
+#     df_test = df_mi.iloc[train_index:]
 
     Y = np.array(df_train[187].values).astype(int)
     X = np.array(df_train[list(range(187))].values)[..., np.newaxis]
 
     Y_test = np.array(df_test[187].values).astype(int)
     X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]
+
+    if smote:
+        sm = SMOTETomek()
+        X, Y = sm.fit_resample(X,Y)  
+        X = X[..., np.newaxis]
 
     train_dataset = CustomDataset(X, Y)
     val_dataset = CustomDataset(X_test, Y_test)
