@@ -56,7 +56,7 @@ def eval(model, val_loader, criterion):
         y_pred = []
         y_true = []
         for x, y in val_loader:
-            x=x.to(device).reshape(-1, 1, 187).float()
+            x=x.to(device).float()
             y = y.to(device).long()
             y_hat = model(x)
             val_loss += criterion(y_hat, y).item()
@@ -74,12 +74,12 @@ def eval(model, val_loader, criterion):
 
 
 def train(model, train_loader, val_loader, n_epochs, criterion, optimizer):
-    model.train()
     for epoch in range(n_epochs):
+        model.train()
         train_loss = 0
         i=0
         for x, y in train_loader:
-            x=x.to(device).reshape(-1, 1, 187).float()
+            x=x.to(device).float()
             y = y.to(device).long()
             y_hat = model(x)
             loss = criterion(y_hat, y)
@@ -101,3 +101,15 @@ def train(model, train_loader, val_loader, n_epochs, criterion, optimizer):
 #         print('class 4 :', stats[3])
 #         print('class 5 :', stats[4])
         print('avg metrics :', avgstats)
+
+    
+def run_ecg(model_name, somte=False,batch_size=200, learning_rate=0.0005, num_epochs=25, save_model=False, save_path=None):
+    
+    train_loader, val_loader = process_data.load_data(batch_size=batch_size, smote=smote)
+    model = models.get_model(model_name)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    train(model, train_loader, val_loader, num_epochs, criterion, optimizer)
+    if save_model:
+        torch.save(model.state_dict(), save_path)
+    return model

@@ -19,7 +19,7 @@ class CustomDataset(Dataset):
         return torch.tensor(self.x[index]), torch.tensor(self.y[index])
 
 
-def load_data(batch_size = 128, smote=False):
+def load_data(batch_size = 128, smote=False, num_samples=-1):
 
     df_train = pd.read_csv("input/mitbih_train.csv", header=None)
     df_train = df_train.sample(frac=1)
@@ -39,6 +39,9 @@ def load_data(batch_size = 128, smote=False):
 
     train_dataset = CustomDataset(X, Y)
     val_dataset = CustomDataset(X_test, Y_test)
+    if num_samples > 0:
+        train_dataset = train_dataset[:num_samples]
+        val_dataset = val_dataset[:num_samples]
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size)
