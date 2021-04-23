@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
-def get_embeddings(model, loader):
+def get_embeddings(model, loader, device):
     model.eval()
     model.fc2 = nn.Sequential()
     x_pred = []
@@ -25,12 +25,13 @@ def get_embeddings(model, loader):
 def get_tsne(embeds):
     tsne = TSNE(2, verbose=1)
     tsne_proj = tsne.fit_transform(embeds)
+    return tsne_proj
 
 def plot_tsne(coordinates, labels, num_categories = 5):
     cmap = cm.get_cmap('tab10')
     fig, ax = plt.subplots(figsize=(8,8))
     for lab in range(num_categories):
         indices = labels==lab
-        ax.scatter(tsne_proj[indices,0],tsne_proj[indices,1], c=np.array(cmap(lab)).reshape(1,4), label = lab ,alpha=0.5)
+        ax.scatter(coordinates[indices,0],coordinates[indices,1], c=np.array(cmap(lab)).reshape(1,4), label = lab ,alpha=0.5)
     ax.legend(fontsize='large', markerscale=2)
     plt.show()
