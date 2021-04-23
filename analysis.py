@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
+import torch.nn as nn
 
 def get_embeddings(model, loader):
     model.eval()
