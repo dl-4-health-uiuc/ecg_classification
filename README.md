@@ -6,7 +6,7 @@ Deep Learning (DL) has recently become a research subject in a variety of fields
 
 The main network used in this code is:
 
-![image-20210506100736395](C:\Users\aksha\AppData\Roaming\Typora\typora-user-images\image-20210506100736395.png)
+![image-20210506100736395](images/cnet)
 
  
 
