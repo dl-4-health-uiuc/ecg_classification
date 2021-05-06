@@ -62,7 +62,7 @@ def load_data_mi(batch_size = 128, smote=False):
 #     df_test = df_mi.iloc[train_index:]
 
     Y = np.array(df_train[187].values).astype(int)
-    X = np.array(df_train[list(range(187))].values)[..., np.newaxis]
+    X = np.array(df_train[list(range(187))].values)
 
     Y_test = np.array(df_test[187].values).astype(int)
     X_test = np.array(df_test[list(range(187))].values)[..., np.newaxis]

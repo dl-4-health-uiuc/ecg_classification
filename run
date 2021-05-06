@@ -1,0 +1,25 @@
+python main.py --epochs 80 --model cnet --smote f --save_model_path cnet_no_smote
+python main.py --epochs 600 --model cnet --mi t --smote f
+python main.py --epochs 600 --model cnet --mi t --smote f --transfer_path cnet_no_smote
+
+python main.py --epochs 80 --model bigru --smote f
+python main.py --epochs 600 --model bigru --mi t --smote f
+
+python main.py --epochs 80 --model bilstm --smote f
+python main.py --epochs 600 --model bilstm --mi t --smote f
+
+python main.py --epochs 80 --model seq --smote f
+python main.py --epochs 600 --model seq --mi t --smote f
+
+python main.py --epochs 80 --model cnet --smote t --save_model_path cnet_smote
+python main.py --epochs 600 --model cnet --mi t --smote t
+python main.py --epochs 600 --model cnet --mi t --smote t --transfer_path cnet_smote
+
+python main.py --epochs 80 --model bigru --smote t
+python main.py --epochs 600 --model bigru --mi t --smote t
+
+python main.py --epochs 80 --model bilstm --smote t
+python main.py --epochs 600 --model bilstm --mi t --smote t
+
+python main.py --epochs 80 --model seq --smote t
+python main.py --epochs 600 --model seq --mi t --smote t

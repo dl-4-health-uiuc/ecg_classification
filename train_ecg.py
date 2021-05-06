@@ -17,16 +17,16 @@ def accuracy_per_class(mcm, clsnum):
     return (mcm[clsnum][0][0] + mcm[clsnum][1][1]) / (mcm[clsnum][0][0] + mcm[clsnum][0][1] + mcm[clsnum][1][0] + mcm[clsnum][1][1])
 
 def sensitivity_per_class(mcm, clsnum):
-    return mcm[clsnum][0][0] / (mcm[clsnum][0][0] + mcm[clsnum][1][0])
-
-def specificity_per_class(mcm, clsnum):
     return mcm[clsnum][1][1] / (mcm[clsnum][1][1] + mcm[clsnum][0][1])
 
+def specificity_per_class(mcm, clsnum):
+    return mcm[clsnum][0][0] / (mcm[clsnum][0][0] + mcm[clsnum][1][0])
+
 def pos_pred_val_per_class(mcm, clsnum):
-    return mcm[clsnum][0][0] / (mcm[clsnum][0][0] + mcm[clsnum][0][1])
+    return mcm[clsnum][1][1] / (mcm[clsnum][1][1] + mcm[clsnum][1][0])
 
 def neg_pred_val_per_class(mcm, clsnum):
-    return mcm[clsnum][1][1] / (mcm[clsnum][1][1] + mcm[clsnum][1][0])
+    return mcm[clsnum][0][0] / (mcm[clsnum][0][0] + mcm[clsnum][0][1])
 
 def stat_per_class(mcm):
     out = []
@@ -74,6 +74,7 @@ def eval(model, val_loader, criterion):
 
 
 def train(model, train_loader, val_loader, n_epochs, criterion, optimizer):
+    max_f1=0
     for epoch in range(n_epochs):
         model.train()
         train_loss = 0
@@ -88,28 +89,48 @@ def train(model, train_loader, val_loader, n_epochs, criterion, optimizer):
             optimizer.step()
             train_loss += loss.item()
         train_loss = train_loss / len(train_loader)
-        print('Epoch: {} \t Training Loss: {:.6f}'.format(epoch+1, train_loss))
         f, acc, cm, mcm, stats, avgstats = eval(model, val_loader, criterion)
-        print('Epoch: %d \t Validation f: %.2f, acc: %.2f'%(epoch+1, f, acc))
-#         print('Confusion matrix')
-#         print(cm)
-#         print(mcm)
-#         print('Accuracy, Sensitivity, Specificity, Positive Pred Value, Negative Pred Value')
-#         print('class 1 :', stats[0])
-#         print('class 2 :', stats[1])
-#         print('class 3 :', stats[2])
-#         print('class 4 :', stats[3])
-#         print('class 5 :', stats[4])
-        print('avg metrics :', avgstats)
+        if epoch > 4 and f > max_f1:
+            max_f1=f
+            print('Epoch: {} \t Training Loss: {:.6f}'.format(epoch+1, train_loss))
+            print('Epoch: %d \t Validation f: %.4f, acc: %.4f'%(epoch+1, f, acc))
+            print('Confusion matrix')
+    #         print(cm)
+    #         print(mcm)
+            print('Accuracy, Sensitivity, Specificity, Positive Pred Value, Negative Pred Value')
+            print('class 1 :', stats[0])
+            print('class 2 :', stats[1])
+            print('class 3 :', stats[2])
+            print('class 4 :', stats[3])
+            print('class 5 :', stats[4])
+            print('avg metrics :', avgstats)
 
+def final_eval(model, val_loader, criterion):
+    f, acc, cm, mcm, stats, avgstats = eval(model, val_loader, criterion)
+    print('Validation f: %.2f, acc: %.2f'%(f, acc))
+    print('Confusion matrix')
+    print(cm)
+    print(mcm)
+    print('Accuracy, Sensitivity, Specificity, Positive Pred Value, Negative Pred Value')
+    print('class 1 :', stats[0])
+    print('class 2 :', stats[1])
+    print('class 3 :', stats[2])
+    print('class 4 :', stats[3])
+    print('class 5 :', stats[4])
+    print('avg metrics :', avgstats)
     
-def run_ecg(model_name, somte=False,batch_size=200, learning_rate=0.0005, num_epochs=25, save_model=False, save_path=None):
+
+def run_ecg(model_name, smote=True,batch_size=256, learning_rate=0.001, num_epochs=25, saved_loader=True, save_path=None):
     
-    train_loader, val_loader = process_data.load_data(batch_size=batch_size, smote=smote)
+    if smote and saved_loader:
+        train_loader = torch.load("train_loader_smote_256")
+        val_loader = torch.load("val_loader_smote_256")
+    else:
+        train_loader, val_loader = process_data.load_data(batch_size=batch_size, smote=smote)
     model = models.get_model(model_name)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     train(model, train_loader, val_loader, num_epochs, criterion, optimizer)
-    if save_model:
+    if save_path:
         torch.save(model.state_dict(), save_path)
     return model
