@@ -29,7 +29,7 @@ def main():
 
     parser.add_argument('--epochs', type=int, default=40)
     parser.add_argument('--model', type=str, default="cnet")
-    parser.add_argument('--smote', type=str2bool, default=True)
+    parser.add_argument('--smote', type=str2bool, default=False)
     parser.add_argument('--batch_size', type=int, default=256)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--transfer_path', type=str, default='')
