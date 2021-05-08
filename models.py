@@ -4,8 +4,11 @@ import torch.nn.functional as F
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 device_count = torch.cuda.device_count()
-    
+
+## All models have a mimodel function which changes the last layer to output 1 instead of 5.
+
 ## The model from the paper ECG Heartbeat Classification: A Deep Transferable Representation
+### The repeating part of the model which has the residual connection as well.
 class CNResidual(nn.Module):
     def __init__(self, size):
         super().__init__()
@@ -19,7 +22,8 @@ class CNResidual(nn.Module):
         x1 = F.relu(self.c1(x))
         x1 = self.c2(x1)
         return self.pool(F.relu(x+x1))
-    
+
+### The whole model as mentioned in the paper.
 class CNet(nn.Module):
 
     def __init__(self, num_resids=5):
@@ -43,7 +47,10 @@ class CNet(nn.Module):
         return self.fc2(x)
     def mimodel(self):
         self.fc2 = nn.Linear(32, 1) 
-    
+
+## A model similar to the one in the paper S. Mousavi and F. Afghah, 
+## Inter- and Intra- Patient ECG Heartbeat Classification for Arrhythmia Detection: A Sequence to Sequence Deep Learning Approach
+### Encoder part of the model. Includes the convolution layers before the LSTM layers.
 class SeqEncoder(nn.Module):
     def __init__(self):
         super().__init__()
@@ -63,12 +70,11 @@ class SeqEncoder(nn.Module):
         x = self.pool2(F.relu(self.c2(x)))
         x = F.relu(self.c3(x))
         s = x.size()
-#         print(x.size())
         x = x.reshape(-1, 1, s[1]*s[2])
         output, (hidden, cell) = self.rnn(x)
-#         print(hidden.size())
         return hidden, cell
 
+### Decoder part of the model
 class SeqDecoder(nn.Module):
     def __init__(self):
         super().__init__()
@@ -78,11 +84,11 @@ class SeqDecoder(nn.Module):
     def forward(self, x, hidden, cell):
         # call layers
         out, (hn, cn) = self.rnn(x, (hidden, cell))
-#         print(out.size())
         out = out.squeeze(1)
         out = out[:, :100] + out[:, 100:]
         return out
-
+    
+### combining to seq to seq part of the model
 class SeqModel(nn.Module):
     def __init__(self):
         super().__init__()
@@ -99,6 +105,7 @@ class SeqModel(nn.Module):
     def mimodel(self):
         self.fc2 = nn.Linear(50, 1) 
     
+## A simple BiLSTM/BiGRU model
 class BiRNN(nn.Module):
     def __init__(self, is_lstm=True):
         super().__init__()
@@ -121,7 +128,7 @@ class BiRNN(nn.Module):
         self.fc2 = nn.Linear(64, 1) 
 
 
-
+## function to get the model based on name and model type(mi or not) and a transfer path which has the model state dict path for pretrained models.
 def get_model(model_name, mi=False, transfer=''):
     if model_name == "cnet":
         model = CNet()
@@ -146,7 +153,7 @@ def get_model(model_name, mi=False, transfer=''):
         model = nn.DataParallel(model)
     return model.to(device)
 
-
+# not used for now, this logic is incorporated in get_model
 def transfer_model(pretrained, freeze_params=True, fc2_input=32, fc1_input=64):
     if freeze_params:
         for param in pretrained.parameters():

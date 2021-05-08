@@ -12,7 +12,8 @@ import analysis
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device_count = torch.cuda.device_count()
 
-
+## helper methods to find accuracy, recall, specificity, precision, negative predictive value.
+## The input to these are multilabel confusion metrices where the pos_label is 1(bottom right is TP)
 def accuracy_per_class(mcm, clsnum):
     return (mcm[clsnum][0][0] + mcm[clsnum][1][1]) / (mcm[clsnum][0][0] + mcm[clsnum][0][1] + mcm[clsnum][1][0] + mcm[clsnum][1][1])
 
@@ -28,13 +29,14 @@ def pos_pred_val_per_class(mcm, clsnum):
 def neg_pred_val_per_class(mcm, clsnum):
     return mcm[clsnum][0][0] / (mcm[clsnum][0][0] + mcm[clsnum][0][1])
 
+## single method to get stats for all the 5 classes
 def stat_per_class(mcm):
     out = []
     for clsnum in range(5):
          out.append((accuracy_per_class(mcm, clsnum), sensitivity_per_class(mcm, clsnum), specificity_per_class(mcm, clsnum), \
             pos_pred_val_per_class(mcm, clsnum), neg_pred_val_per_class(mcm, clsnum)))
     return out
-
+## single method to get the average stats for all the 5 classes
 def avg_stats(mcm):
     avg_acc = 0
     avg_sens = 0
@@ -49,6 +51,7 @@ def avg_stats(mcm):
         avg_neg_pred += neg_pred_val_per_class(mcm, clsnum)/5
     return avg_acc, avg_sens, avg_spec, avg_pos_pred, avg_neg_pred
 
+## method to evaluate the model  with validation dataset. 
 def eval(model, val_loader, criterion):
     model.eval()
     with torch.no_grad():
@@ -72,7 +75,7 @@ def eval(model, val_loader, criterion):
         mcm = multilabel_confusion_matrix(y_pred, y_true) # input is inverted to get expected output
     return f, acc, cm, mcm, stat_per_class(mcm), avg_stats(mcm)
 
-
+## method to train the model with train dataset. All the metics for best models(till that epoch) based on f1 score is printed
 def train(model, train_loader, val_loader, n_epochs, criterion, optimizer):
     max_f1=0
     for epoch in range(n_epochs):
@@ -105,6 +108,7 @@ def train(model, train_loader, val_loader, n_epochs, criterion, optimizer):
             print('class 5 :', stats[4])
             print('avg metrics :', avgstats)
 
+## helper function not used now
 def final_eval(model, val_loader, criterion):
     f, acc, cm, mcm, stats, avgstats = eval(model, val_loader, criterion)
     print('Validation f: %.2f, acc: %.2f'%(f, acc))
@@ -119,12 +123,14 @@ def final_eval(model, val_loader, criterion):
     print('class 5 :', stats[4])
     print('avg metrics :', avgstats)
     
-
-def run_ecg(model_name, smote=True,batch_size=256, learning_rate=0.001, num_epochs=25, saved_loader=True, save_path=None):
+## function to train the data and print the results based on the configurations passed.
+## the saved_loader string is just the suffix after loader.
+## a save_path for the model state dict can also be given, so that it can be used as a pretrained model in mi prediction task.
+def run_ecg(model_name, smote=False,batch_size=256, learning_rate=0.001, num_epochs=25, saved_loader='', save_path=None):
     
     if smote and saved_loader:
-        train_loader = torch.load("train_loader_smote_256")
-        val_loader = torch.load("val_loader_smote_256")
+        train_loader = torch.load("train_loader"+saved_loader)
+        val_loader = torch.load("val_loader"+saved_loader)
     else:
         train_loader, val_loader = process_data.load_data(batch_size=batch_size, smote=smote)
     model = models.get_model(model_name)

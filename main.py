@@ -18,6 +18,7 @@ def run(args):
     mi = args.mi
     lr = args.lr
     save_model_path=args.save_model_path
+    saved_loader = args.saved_loader
     
     if mi:
         train_mi.run_mi(model_name, smote=smote, num_epochs=epochs, batch_size=batch_size, learning_rate=lr, transfer=transfer_path, save_path=save_model_path)
@@ -35,6 +36,7 @@ def main():
     parser.add_argument('--transfer_path', type=str, default='')
     parser.add_argument('--mi', type=str2bool, default=False)
     parser.add_argument('--save_model_path', type=str, default='')
+    parser.add_argument('--saved_loader', type=str, default='')
     
     args = parser.parse_args()
     run(args)
