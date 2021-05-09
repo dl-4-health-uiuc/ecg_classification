@@ -1,6 +1,6 @@
 # ECG Heartbeat Classification using Convolutional Neural Network (CNN) and Application of Transfer Learning for MI Classification
 
-Deep Learning (DL) has recently become a research subject in a variety of fields, including healthcare, where timely identification of anomalies on an electrocardiogram (ECG) can be critical in patient monitoring. This technology has recently shown remarkable progress in a variety of tasks, and there are high hopes for its potential to transform clinical practice. Rather than studying and applying transferable information through tasks, most studies have focused on classifying a collection of conditions on a dataset annotated for that task. In this paper, we implement a model based on deep convolutional neural networks i.e. CNNNet which is able to accurately classify five different heartbeat arrhythmias as per the AAMI EC57 standards. Further, we proposed a method for transferring the knowledge acquired by the model in this task to myocardial infraction (MI) classification.
+Deep Learning (DL) has recently become a research subject in a variety of fields, including healthcare, where timely identification of anomalies on an electrocardiogram (ECG) can be critical in patient monitoring. This technology has recently shown remarkable progress in a variety of tasks, and there are high hopes for its potential to transform clinical practice. Rather than studying and applying transferable information through tasks, most studies have focused on classifying a collection of conditions on a dataset annotated for that task. In this project, we implemented a model based on deep convolutional neural networks i.e. CNNNet which is able to accurately classify five different heartbeat arrhythmias as per the AAMI EC57 standards. Further, we proposed a method for transferring the knowledge acquired by the model in this task to myocardial infraction (MI) classification. We trained our proposed model on PhysionNet’s MIT-BIH and PTB Diagnostics datasets and evaluated its performance. According to the results, the proposed CNNNet is able to make predictions with overall F1-score of 0.9366 on arrhythmia classification, 0.9677 on MI prediction using the learned representation through transfer learning and 0.9957 on MI prediction when the model is trained from scratch.
 
 
 
@@ -101,4 +101,36 @@ If a transfer model is given for MI prediction then the last 2 fully connected l
 | Precision         | 87.91    | 98.99    | 76.82    | 95.46    | 69.35    | 98.93    | 97.05          |       |
 | Recall            | 91.26    | 98.85    | 79.86    | 94.48    | 85.19    | 97.95    | 98.5           |       |
 | f1                | 89.41874 | 98.91995 | 78.31051 | 94.96747 | 76.45822 | 98.43756 | 97.76962414    |       |
+
+
+## Contribution
+
+This project was implemented as the Final Course Project for the CS 598 Deep Learning in Healthcare class in Spring 2021 by anantas2, akshayn4, aviralj2 and sp30.
+
+## References
+
+[1] E.J. Benjamin, S.S. Virani, C.W. Callaway, A.M. Chamberlain, A.R. Chang, S. Cheng, ..., R. Deo, et al. Heart disease and stroke statistics-2018 update: A report from the american heart association. Circulation, 137 (12) (2018), p. e67
+[2] ACM H. Society, “Heart diseases and disorders,” 2018. [Online] Available:https://www.hrsonline.org/Patient-Resources/Heart-Diseases-Disorders
+[3] Miotto R, Wang F, Wang S, Jiang X, Dudley JT. Deep learning for healthcare: review, opportunities and challenges. Brief Bioinform.2 018;19(6):1236-1246. doi:10.1093/bib/bbx044
+[4] M. Oquab, L. Bottou, I. Laptev, and J. Sivic, “Learning and transferring mid-level image representations using convolutional neural networks,” 2014 IEEE Conference on Computer Vision and Pattern Recognition, pp. 1717–1724, 2014. 
+[5] Goodfellow, Ian, et al. Deep learning. Vol. 1. No. 2. Cambridge: MIT press, 2016.
+[6] Andreotti, Fernando, et al. "Comparing feature-based classifiers and convolutional neural networks to detect arrhythmia from short segments of ECG." 2017 Computing in Cardiology (CinC). IEEE, 2017.
+[7] U. R. Acharya, S. L. Oh, Y. Hagiwara, J. H. Tan, M. Adam, A. Gertych, and R. San Tan, “A deep convolutional neural network model to classify heartbeats,” Computers in biology and medicine, vol. 89, pp. 389–396, 2017.
+[8] S. Mousavi and F. Afghah, "Inter- and Intra- Patient ECG Heartbeat Classification for Arrhythmia Detection: A Sequence to Sequence Deep Learning Approach," ICASSP 2019 - 2019 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), Brighton, UK, 2019, pp. 1308-1312, doi: 10.1109/ICASSP.2019.8683140.
+[9] A. L. Goldberger, L. A. Amaral, L. Glass, J. M. Hausdorff, P. C. Ivanov, R. G. Mark, J. E. Mietus, G. B. Moody, C.-K. Peng, and H. E. Stanley, “Physiobank, physiotoolkit, and physionet,” Circulation, vol. 101, no. 23, pp. e215–e220, 2000.
+[10]  G. B. Moody and R. G. Mark, “The impact of the mit-bih arrhythmia database,” IEEE Engineering in Medicine and Biology Magazine, vol. 20, no. 3, pp. 45–50, 2001.
+[11]  R. Bousseljot, D. Kreiseler, and A. Schnabel, “Nutzung der ekgsignaldatenbank cardiodat der ptb uber das internet,” ¨ Biomedizinische Technik/Biomedical Engineering, vol. 40, no. s1, pp. 317–318, 1995.
+[12]  Preprocessed data available in Kaggle datasets: https://www.kaggle.com/shayanfazeli/heartbeat
+[13]  Kachuee, Mohammad and Fazeli, Shayan and Sarrafzadeh, Majid, “ECG Heartbeat Classification: A Deep Transferable Representation”, 2018 IEEE International Conference on Healthcare Informatics (ICHI)
+[14]  Chawla NV et al (2002) SMOTE: synthetic minority over-sampling technique. J Artif Intell Res 16:321–357
+[15]  K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in Proceedings of the IEEE conference on computer vision and pattern recognition, 2016, pp. 770–778. 
+[16]  V. Nairand G. E. Hinton, “Rectified linear units improve restricted boltz-mann machines,” in Proceedings of the 27th international conference on machine learning (ICML-10), 2010, pp. 807–814. 
+[17]  Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., … Chintala, S. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. In Advances in Neural Information Processing Systems 32 (pp. 8024–8035). Curran Associates, Inc. Retrieved from http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
+[18]  D. Kingma and J. Ba, “Adam: A method for stochastic optimization,” arXiv preprint arXiv:1412.6980, 2014. 
+[19]  Maaten LV, Hinton G. Visualizing data using t-SNE. Journal of machine learning research. 2008;9(Nov):2579-605.
+[20]  Ilya Sutskever, Oriol Vinyals, and Quoc V. Le. 2014. Sequence to sequence learning with neural networks. In Proceedings of the 27th International Conference on Neural Information Processing Systems - Volume 2 (NIPS'14). MIT Press, Cambridge, MA, USA, 3104–3112.
+[21]  Sepp Hochreiter and Jürgen Schmidhuber. 1997. Long Short-Term Memory. Neural Comput. 9, 8 (November 15, 1997), 1735–1780. DOI:https://doi.org/10.1162/neco.1997.9.8.1735
+[22]  Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. In NIPS 2014 Workshop on Deep Learning, December 2014
+
+
 
